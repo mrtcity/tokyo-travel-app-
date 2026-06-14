@@ -31,6 +31,4 @@
   <path d="M473 142l45 156h-91z" fill="#fff6df" opacity=".88"/>
   <path d="M453 180h42M444 224h60M435 268h78" stroke="#126a73" stroke-width="8" stroke-linecap="round"/>
   <path d="M0 382c126 22 260 34 402 35 172 1 338-14 498-48v151H0z" fill="url(#glow)"/>
-  <text x="58" y="112" font-family="Arial, sans-serif" font-weight="900" font-size="58" fill="#fff6df">TOKYO</text>
-  <text x="61" y="158" font-family="Arial, sans-serif" font-weight="700" font-size="25" fill="#fff6df" opacity=".9">GROUP TRIP PLANNER</text>
 </svg>
