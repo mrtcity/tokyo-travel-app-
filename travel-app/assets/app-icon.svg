@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="東京旅行">
+  <rect width="512" height="512" rx="112" fill="#126a73"/>
+  <circle cx="366" cy="142" r="68" fill="#f1bf65"/>
+  <path d="M105 348c45-100 94-150 147-150s103 50 150 150" fill="none" stroke="#fff6df" stroke-width="42" stroke-linecap="round"/>
+  <path d="M88 380h336" stroke="#fff6df" stroke-width="34" stroke-linecap="round"/>
+  <path d="M153 294h198" stroke="#f1bf65" stroke-width="26" stroke-linecap="round"/>
+  <text x="256" y="438" text-anchor="middle" font-family="Arial, sans-serif" font-size="58" font-weight="800" fill="#fff6df">TOKYO</text>
+</svg>
