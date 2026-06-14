@@ -1,0 +1,19 @@
+{
+  "name": "東京旅行 Planner",
+  "short_name": "東京旅行",
+  "description": "多人東京旅行行程、地圖、交通和記帳工具。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f3ea",
+  "theme_color": "#126a73",
+  "icons": [
+    {
+      "src": "./assets/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
