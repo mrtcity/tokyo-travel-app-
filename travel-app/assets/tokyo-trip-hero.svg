@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="Tokyo night travel illustration">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#183543"/>
+      <stop offset="0.52" stop-color="#2e7280"/>
+      <stop offset="1" stop-color="#f1bf65"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff6df" stop-opacity=".82"/>
+      <stop offset="1" stop-color="#fff6df" stop-opacity=".08"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="520" fill="url(#sky)"/>
+  <circle cx="706" cy="114" r="78" fill="#f7d890" opacity=".95"/>
+  <path d="M0 308c84-34 169-49 255-44 87 5 171 41 252 37 98-4 184-67 393-54v273H0z" fill="#0f2836" opacity=".48"/>
+  <g fill="#102a38">
+    <rect x="54" y="210" width="72" height="310" rx="6"/>
+    <rect x="149" y="176" width="96" height="344" rx="8"/>
+    <rect x="281" y="250" width="64" height="270" rx="6"/>
+    <rect x="394" y="154" width="118" height="366" rx="8"/>
+    <rect x="562" y="228" width="88" height="292" rx="7"/>
+    <rect x="691" y="190" width="122" height="330" rx="8"/>
+  </g>
+  <g fill="#fff6df" opacity=".66">
+    <path d="M82 242h16v16H82zM82 278h16v16H82zM82 314h16v16H82zM82 350h16v16H82z"/>
+    <path d="M180 220h18v16h-18zM180 258h18v16h-18zM180 296h18v16h-18zM180 334h18v16h-18zM180 372h18v16h-18z"/>
+    <path d="M426 198h20v18h-20zM426 240h20v18h-20zM426 282h20v18h-20zM426 324h20v18h-20z"/>
+    <path d="M728 230h21v18h-21zM728 272h21v18h-21zM728 314h21v18h-21zM728 356h21v18h-21z"/>
+  </g>
+  <path d="M458 94l28 54h-56z" fill="#f1bf65"/>
+  <path d="M473 142l45 156h-91z" fill="#fff6df" opacity=".88"/>
+  <path d="M453 180h42M444 224h60M435 268h78" stroke="#126a73" stroke-width="8" stroke-linecap="round"/>
+  <path d="M0 382c126 22 260 34 402 35 172 1 338-14 498-48v151H0z" fill="url(#glow)"/>
+  <text x="58" y="112" font-family="Arial, sans-serif" font-weight="900" font-size="58" fill="#fff6df">TOKYO</text>
+  <text x="61" y="158" font-family="Arial, sans-serif" font-weight="700" font-size="25" fill="#fff6df" opacity=".9">GROUP TRIP PLANNER</text>
+</svg>
