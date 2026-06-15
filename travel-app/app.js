@@ -127,6 +127,8 @@ const restaurantData = {
 const checklist = ["護照、機票、酒店確認、旅遊保險", "Suica / PASMO、信用卡、現金日圓", "迪士尼 App、門票、信用卡綁定", "SHIBUYA SKY、品川水族館、Pixar 展、梵高展預約", "行動電源、轉插、充電線、相機容量", "雨傘、輕便外套、防曬、舒適鞋", "Day 6 行李先放秋葉原站置物櫃"];
 
 const storeKey = "tokyoMobilePlannerV3";
+const syncEndpointKey = "tokyoTravelSheetSyncEndpoint";
+const defaultSyncEndpoint = "https://script.google.com/macros/s/AKfycbzLBof57HJzRmfEkPy09-2eaLAFq7MP1TqL21xvBUD6sqBBLjFzkXCkI-k95qvsyf5CEA/exec";
 const defaultState = {
   activeDay: "day1",
   activeView: "plan",
@@ -175,6 +177,9 @@ const els = {
   balanceList: $("#balanceList"),
   settlementList: $("#settlementList"),
   expenseList: $("#expenseList"),
+  syncStatus: $("#syncStatus"),
+  syncPullBtn: $("#syncPullBtn"),
+  syncPushBtn: $("#syncPushBtn"),
   resetBtn: $("#resetBtn"),
   addTravelerBtn: $("#addTravelerBtn"),
   travelerList: $("#travelerList"),
@@ -192,6 +197,86 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(storeKey, JSON.stringify(state));
+}
+
+function syncEndpoint() {
+  return localStorage.getItem(syncEndpointKey) || defaultSyncEndpoint;
+}
+
+function syncAvailable() {
+  return Boolean(syncEndpoint());
+}
+
+function setSyncStatus(text, tone = "") {
+  if (!els.syncStatus) return;
+  els.syncStatus.textContent = text;
+  els.syncStatus.dataset.tone = tone;
+}
+
+function serializeCloudState() {
+  return {
+    travelers: state.travelers,
+    expenses: state.expenses.map((expense) => ({
+      ...expense,
+      amount: Number(expense.amount) || 0,
+      participants: expense.participants || [],
+    })),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+async function cloudRequest(action, payload = {}) {
+  const endpoint = syncEndpoint();
+  if (!endpoint) throw new Error("未設定 Google Sheet 同步網址");
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ action, ...payload }),
+  });
+  if (!response.ok) throw new Error(`同步失敗：HTTP ${response.status}`);
+  const data = await response.json();
+  if (!data.ok) throw new Error(data.error || "同步失敗");
+  return data;
+}
+
+async function pullCloudState() {
+  if (!syncAvailable()) {
+    setSyncStatus("未連線", "warn");
+    return;
+  }
+  setSyncStatus("拉取中...");
+  try {
+    const data = await cloudRequest("read");
+    state.travelers = data.travelers?.length ? data.travelers : state.travelers;
+    state.expenses = data.expenses?.length ? data.expenses : state.expenses;
+    state = normalizeState(state);
+    render();
+    setSyncStatus(`已拉取 ${state.expenses.length} 筆`, "ok");
+  } catch (error) {
+    setSyncStatus(error.message, "error");
+  }
+}
+
+async function pushCloudState() {
+  if (!syncAvailable()) {
+    setSyncStatus("未連線", "warn");
+    return;
+  }
+  setSyncStatus("上傳中...");
+  try {
+    await cloudRequest("replace", { state: serializeCloudState() });
+    setSyncStatus("已同步", "ok");
+  } catch (error) {
+    setSyncStatus(error.message, "error");
+  }
+}
+
+function queueCloudPush() {
+  if (!syncAvailable()) return;
+  window.clearTimeout(queueCloudPush.timer);
+  queueCloudPush.timer = window.setTimeout(() => {
+    pushCloudState();
+  }, 700);
 }
 
 function normalizeState(nextState) {
@@ -380,6 +465,7 @@ function renderMoney() {
   const total = state.expenses.reduce((sum, e) => sum + Number(e.amount), 0);
   els.totalSpent.textContent = yen.format(total);
   els.perPerson.textContent = yen.format(state.travelers.length ? Math.round(total / state.travelers.length) : 0);
+  setSyncStatus(syncAvailable() ? "已連線" : "未連線", syncAvailable() ? "ok" : "warn");
 
   const paid = Object.fromEntries(state.travelers.map((name) => [name, 0]));
   const owed = Object.fromEntries(state.travelers.map((name) => [name, 0]));
@@ -433,12 +519,14 @@ function renderMoney() {
         participants: [button.dataset.settleTo],
       });
       render();
+      queueCloudPush();
     });
   });
   document.querySelectorAll("[data-expense]").forEach((button) => {
     button.addEventListener("click", () => {
       state.expenses = state.expenses.filter((e) => e.id !== button.dataset.expense);
       render();
+      queueCloudPush();
     });
   });
 }
@@ -536,6 +624,7 @@ els.expenseForm.addEventListener("submit", (event) => {
   els.expenseTitle.value = "";
   els.expenseAmount.value = "";
   render();
+  queueCloudPush();
 });
 
 els.addTravelerBtn.addEventListener("click", () => {
@@ -543,6 +632,7 @@ els.addTravelerBtn.addEventListener("click", () => {
   if (name?.trim() && !state.travelers.includes(name.trim())) {
     state.travelers.push(name.trim());
     render();
+    queueCloudPush();
   }
 });
 
@@ -550,8 +640,12 @@ els.resetBtn.addEventListener("click", () => {
   if (confirm("重設記帳、成員和完成狀態？")) {
     state = structuredClone(defaultState);
     render();
+    queueCloudPush();
   }
 });
+
+els.syncPullBtn.addEventListener("click", pullCloudState);
+els.syncPushBtn.addEventListener("click", pushCloudState);
 
 els.todayBtn.addEventListener("click", () => {
   state.activeView = "plan";
