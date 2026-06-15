@@ -1,5 +1,5 @@
 const SPREADSHEET_ID = "1yCcL2wGDJheSeKYwkMeE4bQggk3mLmR40QQp54RcrSk";
-const EXPENSE_HEADERS = ["id", "createdAt", "day", "title", "amount", "payer", "mode", "category", "participants"];
+const EXPENSE_HEADERS = ["id", "createdAt", "day", "title", "amount", "currency", "payer", "mode", "category", "participants"];
 const MEMBER_HEADERS = ["name"];
 
 function doGet() {
@@ -31,10 +31,11 @@ function readLedger_() {
       day: String(row[2] || "day1"),
       title: String(row[3] || ""),
       amount: Number(row[4]) || 0,
-      payer: String(row[5] || ""),
-      mode: String(row[6] || "equal"),
-      category: String(row[7] || "其他"),
-      participants: String(row[8] || "").split("|").filter(Boolean),
+      currency: String(row[5] || "JPY"),
+      payer: String(row[6] || ""),
+      mode: String(row[7] || "equal"),
+      category: String(row[8] || "其他"),
+      participants: String(row[9] || "").split("|").filter(Boolean),
     }));
   const travelers = memberRows.map((row) => String(row[0] || "").trim()).filter(Boolean);
   return { ok: true, travelers, expenses, updatedAt: new Date().toISOString() };
@@ -57,6 +58,7 @@ function replaceLedger_(state) {
       expense.day,
       expense.title,
       Number(expense.amount) || 0,
+      expense.currency || "JPY",
       expense.payer,
       expense.mode || "equal",
       expense.category || "其他",
