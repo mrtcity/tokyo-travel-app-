@@ -1,4 +1,4 @@
-const cacheName = "tokyo-travel-planner-v5";
+const cacheName = "tokyo-travel-planner-v7";
 const appShell = [
   "./",
   "./index.html",
