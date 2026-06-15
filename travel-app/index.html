@@ -11,7 +11,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./assets/app-icon.svg" />
     <link rel="icon" href="./assets/app-icon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=sync-1" />
+    <link rel="stylesheet" href="./styles.css?v=hkd-1" />
   </head>
   <body>
     <div class="phone-app">
@@ -111,13 +111,14 @@
             <label>項目<input id="expenseTitle" required placeholder="例如：Day 3 午餐" /></label>
             <div class="two-col">
               <label>金額<input id="expenseAmount" required type="number" min="1" step="1" placeholder="5000" /></label>
-              <label>付款人<select id="expensePayer"></select></label>
+              <label>幣種<select id="expenseCurrency"><option value="JPY">日圓 JPY</option><option value="HKD">港幣 HKD</option></select></label>
             </div>
             <div class="two-col">
+              <label>付款人<select id="expensePayer"></select></label>
               <label>日期<select id="expenseDay"></select></label>
-              <label>分類<select id="expenseCategory"><option>餐飲</option><option>交通</option><option>門票</option><option>購物</option><option>住宿</option><option>結算</option><option>其他</option></select></label>
             </div>
-            <div>
+            <div class="two-col">
+              <label>分類<select id="expenseCategory"><option>餐飲</option><option>交通</option><option>門票</option><option>購物</option><option>住宿</option><option>結算</option><option>其他</option></select></label>
               <label>分帳<select id="splitMode"><option value="equal">由以下人分擔</option><option value="payerOnly">只記付款</option></select></label>
             </div>
             <div>
@@ -165,6 +166,6 @@
       </nav>
     </div>
 
-    <script src="./app.js?v=sync-1"></script>
+    <script src="./app.js?v=hkd-1"></script>
   </body>
 </html>
