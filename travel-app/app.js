@@ -1,4 +1,7 @@
-const yen = new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 });
+const moneyFormatters = {
+  JPY: new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }),
+  HKD: new Intl.NumberFormat("zh-HK", { style: "currency", currency: "HKD", maximumFractionDigits: 0 }),
+};
 const colors = ["#c68731", "#126a73", "#bd4b5b", "#2f8066", "#7a5bc0", "#d36b32"];
 
 const tripDays = [
@@ -135,10 +138,7 @@ const defaultState = {
   travelers: ["Tim", "瑤瑤"],
   doneStops: {},
   doneChecks: {},
-  expenses: [
-    { id: crypto.randomUUID(), day: "day1", title: "羽田深夜巴士", amount: 5600, payer: "Tim", mode: "equal", category: "交通", participants: ["Tim", "瑤瑤"] },
-    { id: crypto.randomUUID(), day: "day3", title: "品川午餐", amount: 5200, payer: "瑤瑤", mode: "equal", category: "餐飲", participants: ["Tim", "瑤瑤"] },
-  ],
+  expenses: [],
 };
 
 let state = loadState();
@@ -164,6 +164,7 @@ const els = {
   expenseForm: $("#expenseForm"),
   expenseTitle: $("#expenseTitle"),
   expenseAmount: $("#expenseAmount"),
+  expenseCurrency: $("#expenseCurrency"),
   expensePayer: $("#expensePayer"),
   expenseDay: $("#expenseDay"),
   expenseCategory: $("#expenseCategory"),
@@ -219,6 +220,7 @@ function serializeCloudState() {
     expenses: state.expenses.map((expense) => ({
       ...expense,
       amount: Number(expense.amount) || 0,
+      currency: expense.currency || "JPY",
       participants: expense.participants || [],
     })),
     updatedAt: new Date().toISOString(),
@@ -284,13 +286,41 @@ function normalizeState(nextState) {
   nextState.expenses = (nextState.expenses || []).map((expense) => ({
     ...expense,
     amount: Number(expense.amount) || 0,
+    currency: expense.currency || "JPY",
     category: expense.category || inferCategory(expense),
     participants: (expense.participants || nextState.travelers).filter((name) => nextState.travelers.includes(name)),
   }));
   nextState.expenses.forEach((expense) => {
     if (!expense.participants.length) expense.participants = [...nextState.travelers];
   });
+  if (hasOnlySeedExpenses(nextState.expenses)) nextState.expenses = [];
   return nextState;
+}
+
+function hasOnlySeedExpenses(expenses) {
+  if (expenses.length !== 2) return false;
+  const seedSignatures = new Set(["羽田深夜巴士|5600|Tim|交通", "品川午餐|5200|瑤瑤|餐飲"]);
+  return expenses.every((expense) =>
+    seedSignatures.has(`${expense.title}|${Number(expense.amount) || 0}|${expense.payer}|${expense.category}`)
+  );
+}
+
+function formatMoney(amount, currency = "JPY") {
+  return (moneyFormatters[currency] || moneyFormatters.JPY).format(Math.round(Number(amount) || 0));
+}
+
+function totalsByCurrency(expenses) {
+  return expenses.reduce((totals, expense) => {
+    const currency = expense.currency || "JPY";
+    totals[currency] = (totals[currency] || 0) + Number(expense.amount || 0);
+    return totals;
+  }, {});
+}
+
+function formatCurrencyTotals(totals, divisor = 1) {
+  const entries = Object.entries(totals);
+  if (!entries.length) return formatMoney(0, "JPY");
+  return entries.map(([currency, amount]) => formatMoney(amount / divisor, currency)).join(" / ");
 }
 
 function dayById(id = state.activeDay) {
@@ -433,6 +463,7 @@ function renderMoney() {
   const selectedPayer = els.expensePayer.value;
   const selectedDay = els.expenseDay.value || state.activeDay;
   const selectedCategory = els.expenseCategory.value || "餐飲";
+  const selectedCurrency = els.expenseCurrency.value || "JPY";
   const checkedParticipants = [...document.querySelectorAll("[data-participant]:checked")].map((input) => input.value);
   const selectedMode = els.splitMode.value || "equal";
   els.expensePayer.innerHTML = state.travelers.map((name) => `<option>${name}</option>`).join("");
@@ -440,6 +471,7 @@ function renderMoney() {
   els.expensePayer.value = state.travelers.includes(selectedPayer) ? selectedPayer : state.travelers[0];
   els.expenseDay.value = tripDays.some((day) => day.id === selectedDay) ? selectedDay : state.activeDay;
   els.expenseCategory.value = selectedCategory;
+  els.expenseCurrency.value = ["JPY", "HKD"].includes(selectedCurrency) ? selectedCurrency : "JPY";
   els.splitMode.value = selectedMode;
   const activeParticipants = checkedParticipants.length ? checkedParticipants.filter((name) => state.travelers.includes(name)) : [...state.travelers];
   const otherTravelers = state.travelers.filter((name) => name !== els.expensePayer.value);
@@ -462,40 +494,47 @@ function renderMoney() {
     });
   });
   els.expensePayer.onchange = () => renderMoney();
-  const total = state.expenses.reduce((sum, e) => sum + Number(e.amount), 0);
-  els.totalSpent.textContent = yen.format(total);
-  els.perPerson.textContent = yen.format(state.travelers.length ? Math.round(total / state.travelers.length) : 0);
+  const totals = totalsByCurrency(state.expenses);
+  els.totalSpent.textContent = formatCurrencyTotals(totals);
+  els.perPerson.textContent = formatCurrencyTotals(totals, state.travelers.length || 1);
   setSyncStatus(syncAvailable() ? "已連線" : "未連線", syncAvailable() ? "ok" : "warn");
 
-  const paid = Object.fromEntries(state.travelers.map((name) => [name, 0]));
-  const owed = Object.fromEntries(state.travelers.map((name) => [name, 0]));
+  const paid = Object.fromEntries(state.travelers.map((name) => [name, {}]));
+  const owed = Object.fromEntries(state.travelers.map((name) => [name, {}]));
   state.expenses.forEach((e) => {
+    const currency = e.currency || "JPY";
     const participants = (e.participants?.length ? e.participants : state.travelers).filter((name) => state.travelers.includes(name));
-    paid[e.payer] = (paid[e.payer] || 0) + Number(e.amount);
+    paid[e.payer][currency] = (paid[e.payer][currency] || 0) + Number(e.amount);
     if (e.mode === "equal" && participants.length) {
       const share = Number(e.amount) / participants.length;
-      participants.forEach((name) => (owed[name] = (owed[name] || 0) + share));
+      participants.forEach((name) => {
+        owed[name][currency] = (owed[name][currency] || 0) + share;
+      });
     }
   });
 
   const balances = state.travelers.map((name) => ({
     name,
-    paid: paid[name] || 0,
-    owed: owed[name] || 0,
-    balance: Math.round((paid[name] || 0) - (owed[name] || 0)),
+    paid: paid[name] || {},
+    owed: owed[name] || {},
+    balances: Object.keys({ ...paid[name], ...owed[name] }).reduce((result, currency) => {
+      result[currency] = Math.round((paid[name][currency] || 0) - (owed[name][currency] || 0));
+      return result;
+    }, {}),
   }));
   const primaryTraveler = state.travelers[0];
-  const primaryBalance = balances.find((person) => person.name === primaryTraveler)?.balance || 0;
+  const primaryBalances = balances.find((person) => person.name === primaryTraveler)?.balances || {};
   els.netOwner.textContent = `${primaryTraveler} 淨額`;
-  els.netBalance.textContent = `${primaryBalance >= 0 ? "收" : "付"} ${yen.format(Math.abs(primaryBalance))}`;
+  els.netBalance.textContent = formatBalanceSummary(primaryBalances);
   els.balanceList.innerHTML = state.travelers
     .map((name) => {
-      const balance = balances.find((person) => person.name === name)?.balance || 0;
-      return `<article class="balance-card ${balance >= 0 ? "positive" : "negative"}"><div class="balance-person"><span>${name.slice(0, 1)}</span><div><strong>${name}</strong><em>已付 ${yen.format(paid[name] || 0)} · 應付 ${yen.format(Math.round(owed[name] || 0))}</em></div></div><strong>${balance >= 0 ? "收回" : "補付"} ${yen.format(Math.abs(balance))}</strong></article>`;
+      const person = balances.find((item) => item.name === name);
+      const totalBalance = Object.values(person.balances).reduce((sum, value) => sum + value, 0);
+      return `<article class="balance-card ${totalBalance >= 0 ? "positive" : "negative"}"><div class="balance-person"><span>${name.slice(0, 1)}</span><div><strong>${name}</strong><em>已付 ${formatCurrencyTotals(person.paid)} · 應付 ${formatCurrencyTotals(person.owed)}</em></div></div><strong>${formatBalanceSummary(person.balances)}</strong></article>`;
     })
     .join("");
   els.settlementList.innerHTML = buildSettlements(balances)
-    .map((item) => `<article class="settlement-row"><div><strong>${item.from}</strong><span>給 ${item.to}</span></div><em>${yen.format(item.amount)}</em><button class="settle-button" data-settle-from="${item.from}" data-settle-to="${item.to}" data-settle-amount="${item.amount}" type="button">已還</button></article>`)
+    .map((item) => `<article class="settlement-row"><div><strong>${item.from}</strong><span>給 ${item.to}</span></div><em>${formatMoney(item.amount, item.currency)}</em><button class="settle-button" data-settle-from="${item.from}" data-settle-to="${item.to}" data-settle-amount="${item.amount}" data-settle-currency="${item.currency}" type="button">已還</button></article>`)
     .join("") || `<article class="empty-row">目前不需要互相轉帳。</article>`;
 
   els.expenseList.innerHTML = [...state.expenses]
@@ -503,7 +542,7 @@ function renderMoney() {
     .map((e) => {
       const participants = (e.participants?.length ? e.participants : state.travelers).join("、");
       const splitText = e.mode === "equal" ? `${expenseSplitLabel(e)}：${participants}` : "只記付款，不分帳";
-      return `<article class="expense-row"><div class="expense-icon">${categoryIcon(e.category)}</div><div><strong>${e.title}</strong><span>${dayById(e.day).label} · ${e.category || "其他"} · ${e.payer} 付款</span><small>${splitText}</small></div><strong>${yen.format(e.amount)}</strong><button class="delete-button" data-expense="${e.id}" type="button">×</button></article>`;
+      return `<article class="expense-row"><div class="expense-icon">${categoryIcon(e.category)}</div><div><strong>${e.title}</strong><span>${dayById(e.day).label} · ${e.category || "其他"} · ${e.payer} 付款 · ${e.currency || "JPY"}</span><small>${splitText}</small></div><strong>${formatMoney(e.amount, e.currency)}</strong><button class="delete-button" data-expense="${e.id}" type="button">×</button></article>`;
     })
     .join("");
   document.querySelectorAll("[data-settle-from]").forEach((button) => {
@@ -512,6 +551,7 @@ function renderMoney() {
         id: crypto.randomUUID(),
         title: `結算：${button.dataset.settleFrom} 給 ${button.dataset.settleTo}`,
         amount: Number(button.dataset.settleAmount),
+        currency: button.dataset.settleCurrency || "JPY",
         payer: button.dataset.settleFrom,
         day: state.activeDay,
         mode: "equal",
@@ -561,26 +601,37 @@ function expenseSplitLabel(expense) {
   return "平均分";
 }
 
+function formatBalanceSummary(balances) {
+  const entries = Object.entries(balances).filter(([, amount]) => amount !== 0);
+  if (!entries.length) return `收 ${formatMoney(0, "JPY")}`;
+  return entries
+    .map(([currency, amount]) => `${amount >= 0 ? "收" : "付"} ${formatMoney(Math.abs(amount), currency)}`)
+    .join(" / ");
+}
+
 function buildSettlements(balances) {
-  const debtors = balances
-    .filter((person) => person.balance < 0)
-    .map((person) => ({ name: person.name, amount: Math.abs(person.balance) }))
-    .sort((a, b) => b.amount - a.amount);
-  const creditors = balances
-    .filter((person) => person.balance > 0)
-    .map((person) => ({ name: person.name, amount: person.balance }))
-    .sort((a, b) => b.amount - a.amount);
   const settlements = [];
-  let debtorIndex = 0;
-  let creditorIndex = 0;
-  while (debtorIndex < debtors.length && creditorIndex < creditors.length) {
-    const amount = Math.min(debtors[debtorIndex].amount, creditors[creditorIndex].amount);
-    if (amount > 0) settlements.push({ from: debtors[debtorIndex].name, to: creditors[creditorIndex].name, amount });
-    debtors[debtorIndex].amount -= amount;
-    creditors[creditorIndex].amount -= amount;
-    if (debtors[debtorIndex].amount <= 0) debtorIndex += 1;
-    if (creditors[creditorIndex].amount <= 0) creditorIndex += 1;
-  }
+  const currencies = [...new Set(balances.flatMap((person) => Object.keys(person.balances)))];
+  currencies.forEach((currency) => {
+    const debtors = balances
+      .filter((person) => (person.balances[currency] || 0) < 0)
+      .map((person) => ({ name: person.name, amount: Math.abs(person.balances[currency]) }))
+      .sort((a, b) => b.amount - a.amount);
+    const creditors = balances
+      .filter((person) => (person.balances[currency] || 0) > 0)
+      .map((person) => ({ name: person.name, amount: person.balances[currency] }))
+      .sort((a, b) => b.amount - a.amount);
+    let debtorIndex = 0;
+    let creditorIndex = 0;
+    while (debtorIndex < debtors.length && creditorIndex < creditors.length) {
+      const amount = Math.min(debtors[debtorIndex].amount, creditors[creditorIndex].amount);
+      if (amount > 0) settlements.push({ from: debtors[debtorIndex].name, to: creditors[creditorIndex].name, amount, currency });
+      debtors[debtorIndex].amount -= amount;
+      creditors[creditorIndex].amount -= amount;
+      if (debtors[debtorIndex].amount <= 0) debtorIndex += 1;
+      if (creditors[creditorIndex].amount <= 0) creditorIndex += 1;
+    }
+  });
   return settlements;
 }
 
@@ -615,6 +666,7 @@ els.expenseForm.addEventListener("submit", (event) => {
     id: crypto.randomUUID(),
     title: els.expenseTitle.value.trim(),
     amount: Number(els.expenseAmount.value),
+    currency: els.expenseCurrency.value,
     payer: els.expensePayer.value,
     day: els.expenseDay.value,
     mode: els.splitMode.value,
