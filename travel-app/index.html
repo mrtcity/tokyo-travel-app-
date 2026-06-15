@@ -11,7 +11,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./assets/app-icon.svg" />
     <link rel="icon" href="./assets/app-icon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=splitwise-2" />
+    <link rel="stylesheet" href="./styles.css?v=sync-1" />
   </head>
   <body>
     <div class="phone-app">
@@ -98,6 +98,15 @@
             <div><span id="netOwner">淨額</span><strong id="netBalance">¥0</strong></div>
           </div>
 
+          <section class="sync-panel">
+            <div>
+              <strong>Google Sheet 同步</strong>
+              <span id="syncStatus">未連線</span>
+            </div>
+            <button id="syncPullBtn" class="ghost-button" type="button">拉取</button>
+            <button id="syncPushBtn" class="ghost-button" type="button">上傳</button>
+          </section>
+
           <form id="expenseForm" class="sheet-form">
             <label>項目<input id="expenseTitle" required placeholder="例如：Day 3 午餐" /></label>
             <div class="two-col">
@@ -156,6 +165,6 @@
       </nav>
     </div>
 
-    <script src="./app.js?v=splitwise-2"></script>
+    <script src="./app.js?v=sync-1"></script>
   </body>
 </html>
