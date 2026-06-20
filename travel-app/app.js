@@ -46,26 +46,6 @@ const tripDays = [
     label: "Day 3",
     date: "6/25",
     weekday: "四",
-    title: "品川水族館 -> Pixar / Mundo Pixar 展 -> 梵高展",
-    mapQuery: "Maxell Aqua Park Shinagawa",
-    routeUrl: "https://www.google.com/maps/dir/Ikebukuro+Station/Maxell+Aqua+Park+Shinagawa/Ueno+Royal+Museum",
-    metrics: ["池袋 -> 品川 35-45 分鐘", "Pixar 展場以票券頁為準", "晚上上野大ゴッホ展"],
-    stops: [
-      ["09:30-10:05", "池袋 -> 品川", "JR 山手線到品川，高輪口步行到 Aqua Park。", "IC 約 ¥230/人。", "Shinagawa Station"],
-      ["10:10-12:00", "Maxell Aqua Park Shinagawa", "水族館、海豚表演和拍照。", "門票約 ¥2,500；表演時間看官方。", "Maxell Aqua Park Shinagawa"],
-      ["12:00-13:15", "品川午餐", "品川站、Prince Hotel、Atre 品川一帶。", "不要排太久。", "Atre Shinagawa"],
-      ["13:15-14:00", "品川 -> Pixar 展場", "前往 Pixar / Mundo Pixar 展。", "會場以票券頁面為準。", "Roppongi Hills"],
-      ["14:00-16:00", "Pixar / Mundo Pixar 展", "下午看展。", "2026 東京場需再確認。", "Roppongi Hills"],
-      ["17:00-18:30", "上野之森美術館", "晚上看大ゴッホ展。", "建議預約 17:00 後時段。", "Ueno Royal Museum"],
-      ["18:30-20:15", "上野晚餐", "上野 / 阿美橫町附近。", "看完展後就近食。", "Ameyoko Shopping District"],
-    ],
-    places: ["Maxell Aqua Park Shinagawa", "Atre Shinagawa", "Roppongi Hills", "Ueno Royal Museum", "Ameyoko Shopping District"],
-  },
-  {
-    id: "day4",
-    label: "Day 4",
-    date: "6/26",
-    weekday: "五",
     title: "川越全日 -> 池袋夜晚",
     mapQuery: "Kawagoe Hikawa Shrine",
     routeUrl: "https://www.google.com/maps/dir/Ikebukuro+Station/Kawagoe+Hikawa+Shrine/Kurazukuri+Street",
@@ -78,6 +58,27 @@ const tripDays = [
       ["18:30-21:00", "池袋", "晚餐 / shopping。", "不宜太晚。", "Ikebukuro Station"],
     ],
     places: ["Kawagoe Station", "Kawagoe Hikawa Shrine", "Kurazukuri Street", "Toki no Kane", "Ikebukuro Station"],
+  },
+  {
+    id: "day4",
+    label: "Day 4",
+    date: "6/26",
+    weekday: "五",
+    title: "teamLab Borderless -> 品川水族館 -> teamLab Planets",
+    mapQuery: "teamLab Borderless Azabudai Hills",
+    routeUrl: "https://www.google.com/maps/dir/Ikebukuro+Station/teamLab+Borderless+Azabudai+Hills/Maxell+Aqua+Park+Shinagawa/teamLab+Planets+TOKYO",
+    metrics: ["Borderless 10:30 已購票", "Maxell Aqua Park 下午去", "Planets 19:00 已購票"],
+    stops: [
+      ["09:15-10:10", "池袋 -> 麻布台Hills", "前往 teamLab Borderless。建議 JR/地鐵轉日比谷線到神谷町，或按 Google Maps 即時路線。", "預留入場前排隊時間。", "teamLab Borderless Azabudai Hills"],
+      ["10:30-12:30", "teamLab Borderless", "東京teamLab Borderless數位藝術美術館門票，2x 成人。", "Klook 已購票；10:30 入場。", "teamLab Borderless Azabudai Hills"],
+      ["12:30-13:45", "麻布台 / 六本木午餐", "在麻布台Hills、六本木一帶午餐，之後轉去品川。", "不要排太久，下午要去水族館。", "Azabudai Hills"],
+      ["13:45-14:30", "麻布台 -> 品川", "由神谷町 / 六本木一丁目一帶轉 JR 或地鐵前往品川。", "約 35-50 分鐘；IC 約 ¥250-400/人。", "Shinagawa Station"],
+      ["14:30-16:30", "Maxell Aqua Park Shinagawa", "東京品川水族館指定日期門票，2x 成人；下午看水族館、海豚表演和拍照。", "票面 2026/6/26 10:00，按彈性時間段下午入場。", "Maxell Aqua Park Shinagawa"],
+      ["16:30-17:30", "品川 -> 豐洲", "前往 teamLab Planets TOKYO。可經有樂町 / 豐洲轉乘。", "約 45-60 分鐘；IC 約 ¥400-600/人。", "teamLab Planets TOKYO"],
+      ["17:30-18:45", "豐洲晚餐 / 休息", "在豐洲附近先食晚餐或輕食，整理相機和手機電量。", "Planets 需要赤腳入場，穿著要方便。", "Toyosu Station"],
+      ["19:00-21:00", "teamLab Planets TOKYO", "#AW teamLab Planets TOKYO FI* 門票 + BicCamera 優惠券，2x 成人。", "Klook 已購票；19:00 入場。", "teamLab Planets TOKYO"],
+    ],
+    places: ["teamLab Borderless Azabudai Hills", "Azabudai Hills", "Maxell Aqua Park Shinagawa", "Toyosu Station", "teamLab Planets TOKYO"],
   },
   {
     id: "day5",
@@ -121,13 +122,13 @@ const tripDays = [
 const restaurantData = {
   day1: [["むかん 池袋", "3.54", "不可/少量", "¥1,000-1,999"], ["麺創房 無敵家", "3.5", "不可", "¥1,000-1,999"], ["牛若丸 池袋本店", "3.4", "建議", "¥6,000-7,999"]],
   day2: [["築地玉寿司 舞濱", "3.4", "建議", "¥2,000-4,999"], ["レインフォレストカフェ", "3.3", "建議", "¥2,000-3,999"], ["ロティズ・ハウス", "3.4", "建議", "¥2,000-4,999"]],
-  day3: [["つばめグリル 品川", "3.5", "建議", "¥1,500-2,999"], ["LUXE DINING HAPUNA", "3.5", "建議", "¥4,000-5,999"], ["上野 れんこん", "3.5", "建議", "¥4,000-5,999"]],
-  day4: [["小川菊 川越", "3.6", "建議", "¥4,000-5,999"], ["いちのや 川越", "3.5", "建議", "¥4,000-5,999"], ["小江戸 オハナ", "3.4", "不需/排隊", "¥1,000-2,999"]],
+  day3: [["小川菊 川越", "3.6", "建議", "¥4,000-5,999"], ["いちのや 川越", "3.5", "建議", "¥4,000-5,999"], ["小江戸 オハナ", "3.4", "不需/排隊", "¥1,000-2,999"]],
+  day4: [["Balcony by 6th", "3.5", "建議", "¥2,000-4,999"], ["つばめグリル 品川", "3.5", "建議", "¥1,500-2,999"], ["豊洲市場 寿司大", "3.6", "不需/排隊", "¥3,000-5,999"]],
   day5: [["キャラウェイ 鎌倉", "3.5", "不需/排隊", "¥1,000-1,999"], ["鎌倉 松原庵", "3.6", "建議", "¥2,000-4,999"], ["bills 横浜赤レンガ", "3.5", "建議", "¥2,000-4,999"]],
   day6: [["ヨシカミ 浅草", "3.5", "建議/排隊", "¥2,000-3,999"], ["並木藪蕎麦 浅草", "3.6", "不需/排隊", "¥1,500-2,999"], ["秋葉原魚金", "3.4", "建議", "¥3,000-4,999"]],
 };
 
-const checklist = ["護照、機票、酒店確認、旅遊保險", "Suica / PASMO、信用卡、現金日圓", "迪士尼 App、門票、信用卡綁定", "SHIBUYA SKY、品川水族館、Pixar 展、梵高展預約", "行動電源、轉插、充電線、相機容量", "雨傘、輕便外套、防曬、舒適鞋", "Day 6 行李先放秋葉原站置物櫃"];
+const checklist = ["護照、機票、酒店確認、旅遊保險", "Suica / PASMO、信用卡、現金日圓", "迪士尼 App、門票、信用卡綁定", "SHIBUYA SKY、teamLab Borderless、品川水族館、teamLab Planets 票券", "行動電源、轉插、充電線、相機容量", "雨傘、輕便外套、防曬、舒適鞋", "Day 6 行李先放秋葉原站置物櫃"];
 
 const storeKey = "tokyoMobilePlannerV3";
 const syncEndpointKey = "tokyoTravelSheetSyncEndpoint";
@@ -138,6 +139,7 @@ const defaultState = {
   travelers: ["Tim", "瑤瑤"],
   doneStops: {},
   doneChecks: {},
+  customStops: {},
   expenses: [],
 };
 
@@ -153,6 +155,7 @@ const els = {
   routeLink: $("#routeLink"),
   nextStop: $("#nextStop"),
   markNextBtn: $("#markNextBtn"),
+  addStopBtn: $("#addStopBtn"),
   routeMetrics: $("#routeMetrics"),
   planMap: $("#planMap"),
   progressText: $("#progressText"),
@@ -283,6 +286,7 @@ function queueCloudPush() {
 
 function normalizeState(nextState) {
   nextState.travelers = nextState.travelers?.length ? nextState.travelers : [...defaultState.travelers];
+  nextState.customStops = nextState.customStops || {};
   nextState.expenses = (nextState.expenses || []).map((expense) => ({
     ...expense,
     amount: Number(expense.amount) || 0,
@@ -324,7 +328,43 @@ function formatCurrencyTotals(totals, divisor = 1) {
 }
 
 function dayById(id = state.activeDay) {
-  return tripDays.find((day) => day.id === id) || tripDays[0];
+  const baseDay = tripDays.find((day) => day.id === id) || tripDays[0];
+  const customStops = state.customStops?.[baseDay.id];
+  if (!customStops) return baseDay;
+  const stops = normalizeStops(customStops);
+  return {
+    ...baseDay,
+    stops,
+    places: stops.map((stop) => stop[4]).filter(Boolean),
+    mapQuery: stops[0]?.[4] || baseDay.mapQuery,
+  };
+}
+
+function normalizeStops(stops) {
+  return (stops || [])
+    .filter((stop) => Array.isArray(stop) && stop.some(Boolean))
+    .map((stop) => [stop[0] || "", stop[1] || "未命名行程", stop[2] || "", stop[3] || "", stop[4] || stop[1] || "Tokyo"]);
+}
+
+function editableStops(dayId = state.activeDay) {
+  if (!state.customStops?.[dayId]) {
+    state.customStops[dayId] = tripDays.find((day) => day.id === dayId).stops.map((stop) => [...stop]);
+  }
+  return state.customStops[dayId];
+}
+
+function promptStopFields(stop = ["", "", "", "", ""]) {
+  const time = prompt("時間", stop[0] || "");
+  if (time === null) return null;
+  const title = prompt("地點 / 標題", stop[1] || "");
+  if (title === null) return null;
+  const description = prompt("行程內容", stop[2] || "");
+  if (description === null) return null;
+  const note = prompt("備註", stop[3] || "");
+  if (note === null) return null;
+  const mapPlace = prompt("Google Map 搜尋地點", stop[4] || title || "");
+  if (mapPlace === null) return null;
+  return [time.trim(), title.trim() || "未命名行程", description.trim(), note.trim(), mapPlace.trim() || title.trim() || "Tokyo"];
 }
 
 function mapEmbed(query) {
@@ -347,6 +387,7 @@ function directionsUrl(origin, destination, waypoints = []) {
 }
 
 function dayRouteUrl(day) {
+  if (!day.places.length) return mapSearch(day.mapQuery || "Tokyo");
   const [origin, ...rest] = day.places;
   const destination = rest.pop() || origin;
   return directionsUrl(origin, destination, rest);
@@ -354,7 +395,7 @@ function dayRouteUrl(day) {
 
 function routeFromPrevious(day, index) {
   const destination = day.stops[index][4];
-  const origin = index > 0 ? day.stops[index - 1][4] : day.places[0];
+  const origin = index > 0 ? day.stops[index - 1][4] : day.places[0] || destination;
   return directionsUrl(origin, destination);
 }
 
@@ -408,6 +449,12 @@ function renderPlan() {
     if (nextIndex >= 0) state.doneStops[`${day.id}-${nextIndex}`] = true;
     render();
   };
+  els.addStopBtn.onclick = () => {
+    const nextStop = promptStopFields();
+    if (!nextStop) return;
+    editableStops(day.id).push(nextStop);
+    render();
+  };
 
   els.timeline.innerHTML = day.stops
     .map((stop, index) => {
@@ -423,6 +470,10 @@ function renderPlan() {
           <p>${stop[2]}</p>
           <span class="stop-note">${stop[3]}</span>
           ${transportLink}
+          <div class="stop-actions">
+            <button data-edit-stop="${index}" type="button">修改</button>
+            <button data-delete-stop="${index}" type="button">刪除</button>
+          </div>
         </div>
         <button class="tick-button ${state.doneStops[key] ? "active" : ""}" data-stop="${key}" type="button">✓</button>
       </article>`;
@@ -431,6 +482,23 @@ function renderPlan() {
   document.querySelectorAll("[data-stop]").forEach((button) => {
     button.addEventListener("click", () => {
       state.doneStops[button.dataset.stop] = !state.doneStops[button.dataset.stop];
+      render();
+    });
+  });
+  document.querySelectorAll("[data-edit-stop]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const stops = editableStops(day.id);
+      const index = Number(button.dataset.editStop);
+      const updatedStop = promptStopFields(stops[index]);
+      if (!updatedStop) return;
+      stops[index] = updatedStop;
+      render();
+    });
+  });
+  document.querySelectorAll("[data-delete-stop]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!confirm("刪除這個行程？")) return;
+      editableStops(day.id).splice(Number(button.dataset.deleteStop), 1);
       render();
     });
   });
