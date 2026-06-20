@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#126a73" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="東京旅行" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>東京旅行 Planner</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./assets/app-icon.svg" />
+    <link rel="icon" href="./assets/app-icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css?v=mobile-editor-1" />
+  </head>
+  <body>
+    <div class="phone-app">
+      <header class="trip-hero">
+        <div class="hero-top">
+          <div>
+            <p class="mini-label">Tokyo 2026 · Group Trip</p>
+            <h1>東京旅行 Planner</h1>
+          </div>
+          <button id="todayBtn" class="pill-button" type="button">今天</button>
+        </div>
+        <div class="trip-stats">
+          <div><span>日期</span><strong>6/23-6/29</strong></div>
+          <div><span>基地</span><strong>池袋</strong></div>
+          <div><span>同行</span><strong id="heroPeople">2人</strong></div>
+        </div>
+      </header>
+
+      <nav id="dayRail" class="day-rail" aria-label="選擇日期"></nav>
+
+      <main>
+        <section id="view-plan" class="app-view active">
+          <div class="section-head">
+            <div>
+              <p id="dayKicker" class="mini-label"></p>
+              <h2 id="dayTitle"></h2>
+            </div>
+            <a id="routeLink" class="map-link" target="_blank" rel="noreferrer">路線</a>
+          </div>
+
+          <article class="live-card">
+            <div>
+              <span>下一站</span>
+              <strong id="nextStop">-</strong>
+            </div>
+            <button id="markNextBtn" class="primary-small" type="button">完成</button>
+          </article>
+
+          <div id="routeMetrics" class="metric-strip"></div>
+
+          <div class="map-preview">
+            <iframe id="planMap" title="Google Map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+
+          <div class="subhead-row">
+            <h3>行程流程</h3>
+            <div class="subhead-actions">
+              <span id="progressText"></span>
+              <button id="addStopBtn" class="mini-action-button" type="button">新增</button>
+            </div>
+          </div>
+          <div id="timeline" class="timeline"></div>
+
+          <div class="subhead-row">
+            <h3>餐廳候選</h3>
+            <span>Tabelog 約數</span>
+          </div>
+          <div id="restaurantScroller" class="restaurant-scroller"></div>
+        </section>
+
+        <section id="view-map" class="app-view">
+          <div class="section-head">
+            <div>
+              <p class="mini-label">Map Mode</p>
+              <h2>地圖與地點</h2>
+            </div>
+            <select id="mapDaySelect" aria-label="選擇地圖日期"></select>
+          </div>
+          <div class="map-large">
+            <iframe id="bigMap" title="Google Map large" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+          <div id="placeList" class="place-list"></div>
+        </section>
+
+        <section id="view-money" class="app-view">
+          <div class="section-head">
+            <div>
+              <p class="mini-label">Split Wallet</p>
+              <h2>多人記帳</h2>
+            </div>
+            <button id="resetBtn" class="ghost-button danger" type="button">重設</button>
+          </div>
+
+          <div class="money-summary">
+            <div><span>總支出</span><strong id="totalSpent">¥0</strong></div>
+            <div><span>人均</span><strong id="perPerson">¥0</strong></div>
+            <div><span id="netOwner">淨額</span><strong id="netBalance">¥0</strong></div>
+          </div>
+
+          <section class="sync-panel">
+            <div>
+              <strong>Google Sheet 同步</strong>
+              <span id="syncStatus">未連線</span>
+            </div>
+            <button id="syncPullBtn" class="ghost-button" type="button">拉取</button>
+            <button id="syncPushBtn" class="ghost-button" type="button">上傳</button>
+          </section>
+
+          <form id="expenseForm" class="sheet-form">
+            <label>項目<input id="expenseTitle" required placeholder="例如：Day 3 午餐" /></label>
+            <div class="two-col">
+              <label>金額<input id="expenseAmount" required type="number" min="1" step="1" placeholder="5000" /></label>
+              <label>幣種<select id="expenseCurrency"><option value="JPY">日圓 JPY</option><option value="HKD">港幣 HKD</option></select></label>
+            </div>
+            <div class="two-col">
+              <label>付款人<select id="expensePayer"></select></label>
+              <label>日期<select id="expenseDay"></select></label>
+            </div>
+            <div class="two-col">
+              <label>分類<select id="expenseCategory"><option>餐飲</option><option>交通</option><option>門票</option><option>購物</option><option>住宿</option><option>結算</option><option>其他</option></select></label>
+              <label>分帳<select id="splitMode"><option value="equal">由以下人分擔</option><option value="payerOnly">只記付款</option></select></label>
+            </div>
+            <div>
+              <div class="form-label">誰需要分擔 / 誰受益</div>
+              <div id="participantPresets" class="preset-row"></div>
+              <div id="participantList" class="participant-list"></div>
+            </div>
+            <button class="primary-button" type="submit">新增支出</button>
+          </form>
+
+          <h3 class="list-title">分帳結果</h3>
+          <div id="balanceList" class="stack-list"></div>
+          <h3 class="list-title">建議結算</h3>
+          <div id="settlementList" class="stack-list"></div>
+          <h3 class="list-title">支出紀錄</h3>
+          <div id="expenseList" class="stack-list"></div>
+        </section>
+
+        <section id="view-people" class="app-view">
+          <div class="section-head">
+            <div>
+              <p class="mini-label">Members & Notes</p>
+              <h2>成員與旅行備忘</h2>
+            </div>
+            <button id="addTravelerBtn" class="pill-button" type="button">新增</button>
+          </div>
+          <div id="travelerList" class="member-list"></div>
+
+          <h3 class="list-title">出發前 Checklist</h3>
+          <div id="checkList" class="check-list"></div>
+
+          <h3 class="list-title">Day 5 雨天 Plan B</h3>
+          <article class="note-card">
+            <strong>取消鎌倉 / 橫濱，改去秋葉原</strong>
+            <p>如早上大雨、海邊大風或制服拍照效果不佳，就改為秋葉原室內 shopping。池袋往返秋葉原約 ¥460/人。</p>
+          </article>
+        </section>
+      </main>
+
+      <nav class="bottom-tabs" aria-label="主功能">
+        <button class="active" data-view="plan" type="button"><span>行程</span></button>
+        <button data-view="map" type="button"><span>地圖</span></button>
+        <button data-view="money" type="button"><span>記帳</span></button>
+        <button data-view="people" type="button"><span>成員</span></button>
+      </nav>
+    </div>
+
+    <script src="./app.js?v=mobile-editor-1"></script>
+  </body>
+</html>
